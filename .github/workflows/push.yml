@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature/fix-docker-image-ci
     paths-ignore:
       - '*.md'
       - 'docs/'
@@ -19,9 +20,9 @@ env:
   KUSTOMIZE_VERSION: "4.5.7"
   KUBERNETES_VERSION: "1.23.5"
   KIND_VERSION: "v0.17.0"
-  HELM_REGISTRY_URL: "https://stakater.github.io/stakater-charts"
+  HELM_REGISTRY_URL: ""
   HELM_VERSION: v3.8.2
-  REGISTRY: ghcr.io
+  REGISTRY: ghcr.io/rosemanlabs
 
 jobs:
   build:
