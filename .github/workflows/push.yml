@@ -22,7 +22,7 @@ env:
   KIND_VERSION: "v0.17.0"
   HELM_REGISTRY_URL: ""
   HELM_VERSION: v3.8.2
-  REGISTRY: ghcr.io/rosemanlabs
+  REGISTRY: ghcr.io
 
 jobs:
   build:
@@ -101,7 +101,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ${{env.REGISTRY}}
-        username: stakater-user
+        username: imc-user
         password: ${{secrets.GITHUB_TOKEN}}
 
     - name: Generate image repository path for ghcr registry
