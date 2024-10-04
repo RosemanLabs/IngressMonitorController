@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - feature/fix-docker-image-ci
     paths-ignore:
       - '*.md'
       - 'docs/'
