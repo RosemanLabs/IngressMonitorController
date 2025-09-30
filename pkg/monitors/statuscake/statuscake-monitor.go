@@ -24,8 +24,10 @@ import (
 	"github.com/stakater/IngressMonitorController/v2/pkg/secret"
 )
 
-var log = logf.Log.WithName("statuscake-monitor")
-var rateLimiter = rate.NewLimiter(5, 1) // Allow 5 requests per second
+var (
+	log         = logf.Log.WithName("statuscake-monitor")
+	rateLimiter = rate.NewLimiter(5, 1) // Allow 5 requests per second
+)
 
 // StatusCakeMonitorService is the service structure for StatusCake
 type StatusCakeMonitorService struct {
@@ -134,7 +136,6 @@ func buildUpsertForm(m models.Monitor, cgroup string) url.Values {
 
 	if providerConfig != nil && len(providerConfig.StatusCodes) > 0 {
 		f.Add("status_codes_csv", providerConfig.StatusCodes)
-
 	} else {
 		statusCodes := []string{
 			"204", // No content
@@ -284,7 +285,6 @@ func (service *StatusCakeMonitorService) GetByName(name string) (*models.Monitor
 	}
 	errorString := "GetByName Request failed for name: " + name
 	return nil, errors.New(errorString)
-
 }
 
 // GetByID function will Get a monitor by it's ID
@@ -364,9 +364,6 @@ func (service *StatusCakeMonitorService) doRequest(req *http.Request) (*http.Res
 
 // GetAll function will fetch all monitors
 func (service *StatusCakeMonitorService) GetAll() []models.Monitor {
-	if len(cachedMonitors) > 0 {
-		return cachedMonitors
-	}
 	var StatusCakeMonitorData []StatusCakeMonitorData
 	page := 1
 	for {
@@ -381,8 +378,7 @@ func (service *StatusCakeMonitorService) GetAll() []models.Monitor {
 		}
 		page += 1
 	}
-	cachedMonitors = StatusCakeMonitorMonitorsToBaseMonitorsMapper(StatusCakeMonitorData)
-	return cachedMonitors
+	return StatusCakeMonitorMonitorsToBaseMonitorsMapper(StatusCakeMonitorData)
 }
 
 func (service *StatusCakeMonitorService) fetchMonitors(page int) *StatusCakeMonitor {
@@ -431,7 +427,6 @@ func (service *StatusCakeMonitorService) fetchMonitors(page int) *StatusCakeMoni
 
 // Add will create a new Monitor
 func (service *StatusCakeMonitorService) Add(m models.Monitor) {
-	cachedMonitors = []models.Monitor{}
 	u, err := url.Parse(service.url)
 	if err != nil {
 		log.Error(err, "Unable to Parse monitor URL")
@@ -468,7 +463,6 @@ func (service *StatusCakeMonitorService) Add(m models.Monitor) {
 
 // Update will update an existing Monitor
 func (service *StatusCakeMonitorService) Update(m models.Monitor) {
-	cachedMonitors = []models.Monitor{}
 	u, err := url.Parse(service.url)
 	if err != nil {
 		log.Error(err, "Unable to Parse monitor URL")
@@ -505,7 +499,6 @@ func (service *StatusCakeMonitorService) Update(m models.Monitor) {
 
 // Remove will delete an existing Monitor
 func (service *StatusCakeMonitorService) Remove(m models.Monitor) {
-	cachedMonitors = []models.Monitor{}
 	u, err := url.Parse(service.url)
 	if err != nil {
 		log.Error(err, "Unable to Parse monitor URL")
@@ -527,7 +520,6 @@ func (service *StatusCakeMonitorService) Remove(m models.Monitor) {
 	}
 	if resp.StatusCode != http.StatusNoContent {
 		log.Error(nil, fmt.Sprintf("Delete Request failed for Monitor: %s with id: %s", m.Name, m.ID))
-
 	} else {
 		_, err = service.GetByID(m.ID)
 		if strings.Contains(err.Error(), "Request failed") {
