@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -49,7 +50,6 @@ type EndpointMonitorReconciler struct {
 //+kubebuilder:rbac:groups=endpointmonitor.stakater.com,resources=endpointmonitors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=endpointmonitor.stakater.com,resources=endpointmonitors/finalizers,verbs=update
 //+kubebuilder:rbac:groups=route.openshift.io,resources=routes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=extensions,resources=ingresses,verbs=get;list;watch
 //+kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch
 //+kubebuilder:rbac:groups="",resources=services,verbs=get;list
 //+kubebuilder:rbac:groups="",resources=pods,verbs=get;list
@@ -105,8 +105,11 @@ func (r *EndpointMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *EndpointMonitorReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *EndpointMonitorReconciler) SetupWithManager(mgr ctrl.Manager, maxConcurrentReconciles int) error {
 	return ctrl.NewControllerManagedBy(mgr).
+		WithOptions(controller.Options{
+			MaxConcurrentReconciles: maxConcurrentReconciles,
+		}).
 		For(&endpointmonitorv1alpha1.EndpointMonitor{}).
 		Complete(r)
 }
